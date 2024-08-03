@@ -3,13 +3,16 @@ pipeline {
 	
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-key')
-	GIT_TOKEN = credentials('git_token')
     }
 	
     stages {
         stage('Git Checkout') {
             steps {
-               git "https://${GIT_TOKEN}@github.com/cihancolak/jenkins_gcp.git"
+                withCredentials([string(credentialsId: 'git_token', variable: 'GIT_TOKEN')]) {
+                    git url: "https://github.com/cihancolak/jenkins_gcp.git",
+                        branch: 'main',
+                        credentialsId: 'git_token'
+                }
             }
         }
         
@@ -29,7 +32,7 @@ pipeline {
             }
         }
 
-	    stage('Manual Approval') {
+        stage('Manual Approval') {
             steps {
                 input "Approve?"
             }
